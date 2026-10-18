@@ -66,7 +66,7 @@ namespace OthDriveSystems
         public readonly ConfigEntry<float> CtisTrailPsi, CtisMudPsi, CtisSandPsi, CtisSnowPsi, CtisDeflateRate, CtisInflateRate,
             CtisMaxRadiusDrop, CtisMaxBulge, CtisMaxGripGain, CtisSafeSpeedKmh, CtisSafePsi;
         public readonly ConfigEntry<bool> DashboardEnabled, DashboardDiffMarkers, DashboardHighlightUseSky;
-        public readonly ConfigEntry<float> DashboardGraphicScale, DashboardGraphicOffset, DashboardNameOffset, DashboardRimArc, DashboardTextInset, DashboardTextSize;
+        public readonly ConfigEntry<float> DashboardGraphicScale, DashboardGraphicOffset, DashboardNameOffset, DashboardTileSplit, DashboardTileOuterEnd, DashboardTextInset, DashboardTextSize;
         public readonly ConfigEntry<float> LiftTrail, LiftMud, LiftSand, LiftSnow, LiftFord, LiftRate, CogLiftFactor;
         public readonly ConfigEntry<bool> DebugLog, EnableRunner;
         public readonly ConfigEntry<string> DisabledPatches;
@@ -92,7 +92,8 @@ namespace OthDriveSystems
             DashboardGraphicOffset = c.Bind("Dashboard", "GraphicOffsetY", 0f, "Extra vertical shift of the drivetrain drawing in UI pixels (it is placed where the game's vehicle sits in the roll dial).");
             DashboardHighlightUseSky = c.Bind("Dashboard", "HighlightUseSkyGrey", false, "Active mode tile colour: false = the pitch indicator's ground grey, true = its sky grey.");
             DashboardNameOffset = c.Bind("Dashboard", "NameOffsetY", 0f, "Fine vertical shift of the system name in the flat bottom band, UI pixels.");
-            DashboardRimArc = c.Bind("Dashboard", "RimArcDegrees", 232f, "Curved part of the dial rim used for the four mode labels (the flat bottom is excluded).");
+            DashboardTileSplit = c.Bind("Dashboard", "TileSplitDegrees", 58f, "Angle from 12 o'clock where the Sand/Snow tiles end and the Mud/Ford tiles begin.");
+            DashboardTileOuterEnd = c.Bind("Dashboard", "TileOuterEndDegrees", 124f, "How far down the rim the Mud/Ford tiles reach (the flat bottom starts near 135).");
             DashboardTextInset = c.Bind("Dashboard", "TextInset", 12f, "Distance of the mode label baseline inside the rim, in UI pixels.");
             DashboardTextSize = c.Bind("Dashboard", "TextSize", 11f, "Mode label font size (shrinks to fit long names).");
             WaypointClearDistance = c.Bind("Dashboard", "WaypointClearDistance", 6.1f, "Clear your map waypoint when you get within this many metres of it (6.1 m = 20 ft; 0 = never).");

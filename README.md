@@ -92,3 +92,7 @@ After the first run with the mod, settings are in `BepInEx/config/local.oth.driv
 - The two upgrades use the game's unused `Drone` and `Health` upgrade categories, which nothing else in the game reads.
 - In co-op, the features act on your own vehicle. Other players without the mod may not see your rear wheels turn.
 - A game update can break the mod until it is rebuilt against the new interop files.
+
+## License
+
+MIT, see [LICENSE](LICENSE). Over the Hill and its assets belong to Funselektor; this repo contains none of the game's files.

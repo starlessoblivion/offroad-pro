@@ -262,10 +262,9 @@ namespace OthDriveSystems
             float outer = circleRadius;                                 // tile runs to the dial's outer edge
             float inner = Mathf.Max(1f, baseline - size * 0.4f);
             var ringSprite = RingSprite(inner / outer);
-            float arc = Plugin.Cfg.DashboardRimArc.Value, seg = arc / 4f, span = seg - 4f;
             for (int i = 0; i < 4; i++)
             {
-                float centre = -arc / 2f + seg * (i + 0.5f);
+                var (centre, span) = TileRange(i);
                 var go = new GameObject($"OTHDS_ModeTile{i}");
                 var trt = go.AddComponent<RectTransform>();
                 trt.SetParent(parent, false);
@@ -307,17 +306,32 @@ namespace OthDriveSystems
             return s;
         }
 
+        // Tile i (0 Mud, 1 Sand, 2 Snow, 3 Ford) as (centre, span) in degrees clockwise from 12 o'clock.
+        // Sand/Snow fill 0..split either side of the top; Mud/Ford run from split down to outerEnd near the flat bottom.
+        static (float centre, float span) TileRange(int i)
+        {
+            const float gap = 4f;
+            float split = Plugin.Cfg.DashboardTileSplit.Value, outer = Plugin.Cfg.DashboardTileOuterEnd.Value;
+            float a0, a1;
+            switch (i)
+            {
+                case 0: a0 = -outer; a1 = -split; break;
+                case 1: a0 = -split; a1 = 0f; break;
+                case 2: a0 = 0f; a1 = split; break;
+                default: a0 = split; a1 = outer; break;
+            }
+            return ((a0 + a1) * 0.5f, a1 - a0 - gap);
+        }
+
         // Bends each label onto an arc just inside the rim: glyphs upright, facing outward, reading clockwise.
         static void WarpTiles()
         {
-            float arc = Plugin.Cfg.DashboardRimArc.Value;          // usable curved rim, degrees
-            float seg = arc / 4f;
             float radius = circleRadius - Plugin.Cfg.DashboardTextInset.Value;
             for (int i = 0; i < 4; i++)
             {
                 var txt = tileText[i];
                 if (txt == null) continue;
-                float centre = -arc / 2f + seg * (i + 0.5f);
+                var (centre, _) = TileRange(i);
                 txt.ForceMeshUpdate();
                 var ti = txt.textInfo;
                 if (ti.characterCount == 0) continue;
