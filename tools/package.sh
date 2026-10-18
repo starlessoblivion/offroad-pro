@@ -13,6 +13,11 @@ CACHE="$ROOT/.cache"
 DIST="$ROOT/dist"
 mkdir -p "$CACHE" "$DIST"
 
+# Game build the zips are made against: Steam build id from the library's appmanifest (override with GAME_BUILD=...).
+MANIFEST="$(dirname "$(dirname "$GAMEDIR")")/appmanifest_2929250.acf"
+GAME_BUILD="${GAME_BUILD:-$(sed -n 's/.*"buildid"[[:space:]]*"\([0-9]*\)".*/\1/p' "$MANIFEST" 2>/dev/null | head -1)}"
+GAME_BUILD="${GAME_BUILD:-unknown}"
+
 fetch() {   # platform -> cached BepInEx zip
     local plat="$1" out="$CACHE/BepInEx-Unity.IL2CPP-$1-6.0.0-be.${BEPINEX_BUILD}.zip"
     [ -s "$out" ] || curl -fL --retry 8 -o "$out" \
@@ -25,19 +30,19 @@ fetch() {   # platform -> cached BepInEx zip
 dotnet build "$ROOT/OthDriveSystems.csproj" -c Release -v q -p:GameDir="$GAMEDIR"
 DLL="$ROOT/bin/Release/net6.0/OthDriveSystems.dll"
 
-for PLAT in windows linux; do
+for PLAT in Windows Linux; do
     case "$PLAT" in
-        windows) BEP=$(fetch win-x64)
+        Windows) BEP=$(fetch win-x64)
                  STEP="3. Nothing else to set up on Windows."
                  UNEXTRA=" (winhttp.dll, doorstop_config.ini, .doorstop_version, changelog.txt, dotnet folder)" ;;
-        linux)   BEP=$(fetch linux-x64)
+        Linux)   BEP=$(fetch linux-x64)
                  STEP="3. Linux: in Steam > Over the Hill > Properties > Launch Options, enter (with your path):
    \"/path/to/steamapps/common/over the hill/run_bepinex.sh\" %command%"
                  UNEXTRA=" (libdoorstop.so, run_bepinex.sh, .doorstop_version, changelog.txt, dotnet folder) and clear the launch option" ;;
     esac
     STAGE="$(mktemp -d)"
     unzip -q "$BEP" -d "$STAGE"
-    if [ "$PLAT" = linux ]; then
+    if [ "$PLAT" = Linux ]; then
         sed -i 's/^executable_name=""/executable_name="over the hill.x86_64"/' "$STAGE/run_bepinex.sh"
         chmod +x "$STAGE/run_bepinex.sh"
     fi
@@ -55,7 +60,7 @@ if dst.endswith(".txt") and "windows" in step.lower():
     t = t.replace("\n", "\r\n")
 open(dst, "w", newline="").write(t)
 EOF
-    OUT="$DIST/OffroadPro-${VERSION}-${PLAT}.zip"
+    OUT="$DIST/OffroadPro_${VERSION}_${PLAT}_build${GAME_BUILD}.zip"
     rm -f "$OUT"
     python3 - "$STAGE" "$OUT" <<'EOF2'
 import os, sys, zipfile
