@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>OthDriveSystems</AssemblyName>
+    <RootNamespace>OthDriveSystems</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Game folder with BepInEx installed and run once (BepInEx/interop generated).
+       Override with: dotnet build -p:GameDir="/path/to/over the hill" -->
+  <PropertyGroup Condition="'$(GameDir)' == '' And $([MSBuild]::IsOSPlatform('Linux'))">
+    <GameDir>$(HOME)/.local/share/Steam/steamapps/common/over the hill</GameDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GameDir)' == '' And $([MSBuild]::IsOSPlatform('Windows'))">
+    <GameDir>C:\Program Files (x86)\Steam\steamapps\common\over the hill</GameDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="tools/**" />
+    <Reference Include="$(GameDir)/BepInEx/core/*.dll" Private="false" />
+    <Reference Include="$(GameDir)/BepInEx/interop/*.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(GameDir)/BepInEx/interop')" Text="BepInEx interop assemblies not found in '$(GameDir)/BepInEx/interop'. Install BepInEx, launch the game once, or pass -p:GameDir=..." />
+  </Target>
+</Project>
