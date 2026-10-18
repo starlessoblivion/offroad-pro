@@ -5,7 +5,9 @@ This zip contains the mod plus BepInEx 6 (bleeding edge #789, IL2CPP), already c
 
 INSTALL
 1. Find the game folder: Steam > Over the Hill > right-click > Manage > Browse local files.
-2. Extract everything in this zip into that folder, so that the BepInEx folder sits next to the game executable.
+2. Extract the CONTENTS of this zip directly into that folder. Many archive tools put the files in a new
+   subfolder named after the zip; if that happens, move everything out of it into the game folder.
+   When it is right, the BepInEx folder sits next to the game executable (over the hill.x86_64 / .exe).
 {PLATFORM_STEP}
 4. Launch the game. The FIRST launch takes several minutes before the game window appears while BepInEx prepares itself for your copy of the game. Wait for the main menu.
 5. Load your save. Rear Wheel Steering and Tank Turn are in the garage's performance upgrades; the drive mode switch is a new entry in the radial menu.

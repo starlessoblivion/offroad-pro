@@ -41,7 +41,7 @@ A third dial to the right of the pitch and roll indicators:
 
 ## Installing (players)
 
-1. Install **BepInEx 6 bleeding edge, IL2CPP**, from https://builds.bepinex.dev/projects/bepinex_be. Use the `BepInEx-Unity.IL2CPP` build for your platform (`linux-x64` or `win-x64`) and extract it into the game folder.
+1. Install **BepInEx 6 bleeding edge, IL2CPP**, from https://builds.bepinex.dev/projects/bepinex_be. Use the `BepInEx-Unity.IL2CPP` build for your platform (`linux-x64` or `win-x64`) and extract its contents directly into the game folder (not into a subfolder named after the zip).
 2. **Linux only:** in `run_bepinex.sh` set `executable_name="over the hill.x86_64"`, then set the Steam launch option to:
    ```
    "/path/to/steamapps/common/over the hill/run_bepinex.sh" %command%
