@@ -4,3 +4,5 @@ obj/
 *.log
 interop-reference.txt
 tools/interop-dump/out/
+.cache/
+dist/

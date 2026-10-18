@@ -1,0 +1,36 @@
+Offroad Pro {VERSION} for Over the Hill
+https://github.com/starlessoblivion/offroad-pro
+
+This zip contains the mod plus BepInEx 6 (bleeding edge #789, IL2CPP), already configured.
+
+INSTALL
+1. Find the game folder: Steam > Over the Hill > right-click > Manage > Browse local files.
+2. Extract everything in this zip into that folder, so that the BepInEx folder sits next to the game executable.
+{PLATFORM_STEP}
+4. Launch the game. The FIRST launch takes several minutes before the game window appears while BepInEx prepares itself for your copy of the game. Wait for the main menu.
+5. Load your save. Rear Wheel Steering and Tank Turn are in the garage's performance upgrades; the drive mode switch is a new entry in the radial menu.
+
+FEATURES
+- Rear Wheel Steering (upgrade, 75 pebbles): rear wheels counter-steer for a tighter turning circle.
+- Tank Turn (upgrade, 100 pebbles): stop, hold A (gamepad) or Left Alt (keyboard) and steer to spin in place.
+- Terrain modes with tire pressure (radial menu): Trail, Mud, Sand, Snow, Ford.
+- Drivetrain dial on the HUD: steering, High/Low range, diff locks, mode, waypoint distance, tire pressure.
+
+SETTINGS
+After the first run: BepInEx/config/local.oth.drivesystems.cfg
+
+UNINSTALL
+1. Close the game. Remove the mod's items from your save so the unmodded game loads it:
+   python3 remove_mod_items.py "<your save folder>/Player1.json"
+   (it keeps a backup next to the save)
+2. Delete the BepInEx folder and the other files this zip added{UNINSTALL_EXTRA}.
+
+PROBLEMS
+- Occasionally the game crashes during startup with BepInEx. Launching again works.
+- Logs: BepInEx/LogOutput.log and BepInEx/OthDriveSystems.trace.log
+- Report issues: https://github.com/starlessoblivion/offroad-pro/issues
+
+This is a beta. Back up your save before using it.
+
+LICENSES
+Offroad Pro: MIT (LICENSE-OffroadPro.txt). BepInEx: LGPL-2.1 (LICENSE-BepInEx.txt).
