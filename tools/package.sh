@@ -93,12 +93,10 @@ EOF
     echo "$OUT"
 done
 
-# MelonLoader: the mod alone; players install MelonLoader 0.7.3+ themselves.
+# MelonLoader: just Mods/OffroadPro.dll; players install MelonLoader 0.7.3+ themselves.
 STAGE="$(mktemp -d)"
 mkdir -p "$STAGE/Mods"
 cp "$ML_DLL" "$STAGE/Mods/"
-cp "$ROOT/LICENSE" "$STAGE/LICENSE-OffroadPro.txt"
-sed "s/{VERSION}/$VERSION/" "$ROOT/packaging/INSTALL-MelonLoader.txt" > "$STAGE/OffroadPro-README.txt"
 OUT="$DIST/OffroadPro_${VERSION}_MelonLoader_build${GAME_BUILD}.zip"
 rm -f "$OUT"
 zipdir "$STAGE" "$OUT"
