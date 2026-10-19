@@ -1,0 +1,33 @@
+Offroad Pro {VERSION} for Over the Hill
+https://github.com/starlessoblivion/offroad-pro
+
+REQUIRES
+MelonLoader 0.7.3 or newer.
+
+INSTALL
+Put OffroadPro.dll in the game's Mods folder (over the hill/Mods/OffroadPro.dll), then launch the game.
+
+FEATURES
+- Rear Wheel Steering (upgrade, 75 pebbles): rear wheels counter-steer for a tighter turning circle.
+- Tank Turn (upgrade, 100 pebbles): stop, hold A (gamepad) or Left Alt (keyboard) and steer to spin in place.
+- Terrain modes with tire pressure (radial menu): Trail, Mud, Sand, Snow, Ford.
+- Drivetrain dial on the HUD: steering, High/Low range, diff locks, mode, waypoint distance, tire pressure.
+Both upgrades are in the garage's performance upgrades.
+
+SETTINGS
+UserData/local.oth.drivesystems.cfg (created on the first run)
+
+UNINSTALL
+1. Close the game and remove the mod's items from your save:
+   python3 remove_mod_items.py "<your save folder>/Player1.json"
+   (it keeps a backup next to the save)
+2. Delete Mods/OffroadPro.dll.
+
+PROBLEMS
+Logs: MelonLoader/Latest.log
+Report issues: https://github.com/starlessoblivion/offroad-pro/issues
+
+This is a beta. Back up your save before using it.
+
+LICENSE
+MIT (LICENSE-OffroadPro.txt)

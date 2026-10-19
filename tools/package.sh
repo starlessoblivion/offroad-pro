@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds release zips: dist/OffroadPro-<version>-<platform>.zip for windows and linux.
+# Builds release zips in dist/: Windows and Linux (BepInEx bundled) plus MelonLoader (mod only, any OS).
 # Usage: tools/package.sh <version> [GameDir]
 #   GameDir = game folder with BepInEx installed and run once (needed to compile against the interop assemblies).
 set -euo pipefail
@@ -27,8 +27,34 @@ fetch() {   # platform -> cached BepInEx zip
 [ -s "$CACHE/BepInEx-LICENSE.txt" ] || curl -fL -o "$CACHE/BepInEx-LICENSE.txt" \
     https://raw.githubusercontent.com/BepInEx/BepInEx/master/LICENSE
 
+ML_VERSION=0.7.3
+ML_DIR="$CACHE/MelonLoader-$ML_VERSION"
+if [ ! -s "$ML_DIR/MelonLoader/net6/MelonLoader.dll" ]; then
+    [ -s "$CACHE/ml-MelonLoader.x64.zip" ] || curl -fL --retry 8 -o "$CACHE/ml-MelonLoader.x64.zip" \
+        "https://github.com/LavaGang/MelonLoader/releases/download/v$ML_VERSION/MelonLoader.x64.zip"
+    unzip -qo "$CACHE/ml-MelonLoader.x64.zip" 'MelonLoader/net6/*' -d "$ML_DIR"
+fi
+
 dotnet build "$ROOT/OthDriveSystems.csproj" -c Release -v q -p:GameDir="$GAMEDIR"
 DLL="$ROOT/bin/Release/net6.0/OthDriveSystems.dll"
+dotnet build "$ROOT/OthDriveSystems.csproj" -c Release -v q -p:GameDir="$GAMEDIR" -p:Loader=MelonLoader -p:MelonLoaderDir="$ML_DIR/MelonLoader/net6"
+ML_DLL="$ROOT/bin/Release-MelonLoader/net6.0/OffroadPro.dll"
+
+zipdir() {   # stage dir -> zip, keeping unix mode bits (run_bepinex.sh stays executable)
+    python3 - "$1" "$2" <<'EOF2'
+import os, sys, zipfile
+stage, out = sys.argv[1:]
+with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    for root, dirs, files in os.walk(stage):
+        dirs.sort()
+        for f in sorted(files):
+            full = os.path.join(root, f)
+            info = zipfile.ZipInfo.from_file(full, os.path.relpath(full, stage))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            with open(full, "rb") as fh:
+                z.writestr(info, fh.read())
+EOF2
+}
 
 for PLAT in Windows Linux; do
     case "$PLAT" in
@@ -62,19 +88,20 @@ open(dst, "w", newline="").write(t)
 EOF
     OUT="$DIST/OffroadPro_${VERSION}_${PLAT}_build${GAME_BUILD}.zip"
     rm -f "$OUT"
-    python3 - "$STAGE" "$OUT" <<'EOF2'
-import os, sys, zipfile
-stage, out = sys.argv[1:]
-with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-    for root, dirs, files in os.walk(stage):
-        dirs.sort()
-        for f in sorted(files):
-            full = os.path.join(root, f)
-            info = zipfile.ZipInfo.from_file(full, os.path.relpath(full, stage))
-            info.compress_type = zipfile.ZIP_DEFLATED
-            with open(full, "rb") as fh:
-                z.writestr(info, fh.read())   # keeps unix mode bits (run_bepinex.sh stays executable)
-EOF2
+    zipdir "$STAGE" "$OUT"
     rm -rf "$STAGE"
     echo "$OUT"
 done
+
+# MelonLoader: the mod alone; players install MelonLoader 0.7.3+ themselves.
+STAGE="$(mktemp -d)"
+mkdir -p "$STAGE/Mods"
+cp "$ML_DLL" "$STAGE/Mods/"
+cp "$ROOT/LICENSE" "$STAGE/LICENSE-OffroadPro.txt"
+cp "$ROOT/tools/remove_mod_items.py" "$STAGE/remove_mod_items.py"
+sed "s/{VERSION}/$VERSION/" "$ROOT/packaging/INSTALL-MelonLoader.txt" > "$STAGE/OffroadPro-README.txt"
+OUT="$DIST/OffroadPro_${VERSION}_MelonLoader_build${GAME_BUILD}.zip"
+rm -f "$OUT"
+zipdir "$STAGE" "$OUT"
+rm -rf "$STAGE"
+echo "$OUT"

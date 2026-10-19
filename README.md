@@ -2,7 +2,7 @@
 
 A BepInEx mod for **Over the Hill** (Funselektor, 2026) that adds real-world off-road systems: rear wheel steering, tank turning, terrain modes with a central tire inflation system (CTIS), and a drivetrain dial on the HUD.
 
-Tested on the native Linux build of the game (Unity 6000.0.75, IL2CPP) with BepInEx 6 bleeding edge #789. The Windows build has not been tested yet.
+Tested with MelonLoader 0.7.3 on the Windows build of the game under Proton (Steam build 26047935) and on the native Linux build (Steam build 25992246), and with BepInEx 6 bleeding edge #789 on native Linux. The game is Unity 6000.0.75, IL2CPP.
 
 ## Features
 
@@ -41,6 +41,18 @@ A third dial to the right of the pitch and roll indicators:
 
 ## Installing (players)
 
+Requires **MelonLoader 0.7.3 or newer** (Windows, Linux under Proton, or native Linux).
+
+1. Download `OffroadPro_<version>_MelonLoader_build<game build>.zip` from the releases page.
+2. Put `OffroadPro.dll` in the game's `Mods` folder and launch the game.
+
+Settings are in `UserData/local.oth.drivesystems.cfg` after the first run.
+
+### BepInEx (alternative)
+
+The mod also builds as a BepInEx 6 plugin. BepInEx and MelonLoader cannot share a game folder, so use one or the other.
+
+
 1. Install **BepInEx 6 bleeding edge, IL2CPP**, from https://builds.bepinex.dev/projects/bepinex_be. Use the `BepInEx-Unity.IL2CPP` build for your platform (`linux-x64` or `win-x64`) and extract its contents directly into the game folder (not into a subfolder named after the zip).
 2. **Linux only:** in `run_bepinex.sh` set `executable_name="over the hill.x86_64"`, then set the Steam launch option to:
    ```
@@ -61,6 +73,14 @@ dotnet build -c Release -p:GameDir="/path/to/steamapps/common/over the hill"
 ```
 
 Without `-p:GameDir`, the build looks in the default Steam library for your OS. The output is `bin/Release/net6.0/OthDriveSystems.dll`.
+
+The MelonLoader build uses the same source and the same BepInEx interop assemblies, plus MelonLoader 0.7.3's `MelonLoader/net6` folder (extract it to `.cache/MelonLoader-0.7.3/` or pass `-p:MelonLoaderDir=...`; `tools/package.sh` downloads it):
+```
+dotnet build -c Release -p:GameDir="/path/to/steamapps/common/over the hill" -p:Loader=MelonLoader
+```
+After compiling, `tools/ml-rewrite` renames the game references to MelonLoader's naming (MelonLoader generates its interop assemblies with an `Il2Cpp` prefix on every namespace and assembly outside `Assembly-CSharp*` and `Unity*`, BepInEx does not). The output is `bin/Release-MelonLoader/net6.0/OffroadPro.dll`.
+
+`tools/package.sh <version> [GameDir]` builds all three release zips into `dist/`.
 
 `tools/interop-dump` is a small metadata reader for exploring the generated interop assemblies:
 ```

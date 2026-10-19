@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <Nullable>disable</Nullable>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <MelonLoaderDir Condition="'$(MelonLoaderDir)' == ''">$(MSBuildThisFileDirectory)../../.cache/MelonLoader-0.7.3/MelonLoader/net6</MelonLoaderDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(MelonLoaderDir)/Mono.Cecil.dll" />
+  </ItemGroup>
+</Project>

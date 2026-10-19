@@ -1,17 +1,22 @@
+#if MELONLOADER
+using OthDriveSystems.Compat;
+#else
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
+#endif
 using HarmonyLib;
 
 namespace OthDriveSystems
 {
+#if !MELONLOADER
     [BepInPlugin(Guid, Name, Version)]
     public class Plugin : BasePlugin
     {
         public const string Guid = "local.oth.drivesystems";
         public const string Name = "Offroad Pro";
-        public const string Version = "0.1.0";
+        public const string Version = "0.1.1";
 
         internal static ManualLogSource L;
         internal static Settings Cfg;
@@ -19,10 +24,14 @@ namespace OthDriveSystems
         public override void Load()
         {
             L = Log;
-            Trace.Start();
+            Trace.Start(Paths.BepInExRootPath);
             Trace.Step("config");
             Cfg = new Settings(Config);
-            var harmony = new Harmony(Guid);
+            PatchAll(new Harmony(Guid));
+        }
+
+        internal static void PatchAll(Harmony harmony)
+        {
             foreach (var t in typeof(Plugin).Assembly.GetTypes())
             {
                 if (t.GetCustomAttributes(typeof(HarmonyPatch), false).Length == 0) continue;
@@ -34,15 +43,16 @@ namespace OthDriveSystems
             L.LogInfo($"{Name} {Version} loaded");
         }
     }
+#endif
 
     // Crash-safe progress trace: each line is flushed to disk immediately, so the last line shows where a native crash happened.
     internal static class Trace
     {
         static string path;
 
-        public static void Start()
+        public static void Start(string dir)
         {
-            path = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "OthDriveSystems.trace.log");
+            path = System.IO.Path.Combine(dir, "OthDriveSystems.trace.log");
             System.IO.File.WriteAllText(path, $"{System.DateTime.Now:HH:mm:ss} start\n");
         }
 

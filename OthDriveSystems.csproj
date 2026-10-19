@@ -8,9 +8,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- BepInEx (default) or MelonLoader: dotnet build -p:Loader=MelonLoader -->
+    <Loader Condition="'$(Loader)' == ''">BepInEx</Loader>
   </PropertyGroup>
 
-  <!-- Game folder with BepInEx installed and run once (BepInEx/interop generated).
+  <!-- Game folder with BepInEx installed and run once (BepInEx/interop generated). Both builds compile against it.
        Override with: dotnet build -p:GameDir="/path/to/over the hill" -->
   <PropertyGroup Condition="'$(GameDir)' == '' And $([MSBuild]::IsOSPlatform('Linux'))">
     <GameDir>$(HOME)/.local/share/Steam/steamapps/common/over the hill</GameDir>
@@ -21,11 +23,35 @@
 
   <ItemGroup>
     <Compile Remove="tools/**" />
-    <Reference Include="$(GameDir)/BepInEx/core/*.dll" Private="false" />
     <Reference Include="$(GameDir)/BepInEx/interop/*.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Loader)' == 'BepInEx'">
+    <Reference Include="$(GameDir)/BepInEx/core/*.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- MelonLoader build: references MelonLoader's net6 folder (MelonLoaderDir, default .cache/MelonLoader-0.7.3, filled by tools/package.sh),
+       then tools/ml-rewrite renames the game references to MelonLoader's Il2Cpp-prefixed interop names. -->
+  <PropertyGroup Condition="'$(Loader)' == 'MelonLoader'">
+    <AssemblyName>OffroadPro</AssemblyName>
+    <DefineConstants>$(DefineConstants);MELONLOADER</DefineConstants>
+    <OutputPath>bin/$(Configuration)-MelonLoader/</OutputPath>
+    <IntermediateOutputPath>obj/$(Configuration)-MelonLoader/</IntermediateOutputPath>
+    <MelonLoaderDir Condition="'$(MelonLoaderDir)' == ''">$(MSBuildThisFileDirectory).cache/MelonLoader-0.7.3/MelonLoader/net6</MelonLoaderDir>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Loader)' == 'MelonLoader'">
+    <Reference Include="$(MelonLoaderDir)/MelonLoader.dll" Private="false" />
+    <Reference Include="$(MelonLoaderDir)/0Harmony.dll" Private="false" />
+    <Reference Include="$(MelonLoaderDir)/Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(MelonLoaderDir)/Il2CppInterop.Common.dll" Private="false" />
   </ItemGroup>
 
   <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">
     <Error Condition="!Exists('$(GameDir)/BepInEx/interop')" Text="BepInEx interop assemblies not found in '$(GameDir)/BepInEx/interop'. Install BepInEx, launch the game once, or pass -p:GameDir=..." />
+    <Error Condition="'$(Loader)' == 'MelonLoader' And !Exists('$(MelonLoaderDir)/MelonLoader.dll')" Text="MelonLoader.dll not found in '$(MelonLoaderDir)'. Extract MelonLoader 0.7.3's MelonLoader/net6 folder there or pass -p:MelonLoaderDir=..." />
+  </Target>
+
+  <Target Name="MelonRewrite" AfterTargets="Build" Condition="'$(Loader)' == 'MelonLoader'">
+    <Exec Command="dotnet run -c Release --project &quot;$(MSBuildThisFileDirectory)tools/ml-rewrite&quot; -p:MelonLoaderDir=&quot;$(MelonLoaderDir)&quot; -- &quot;@(IntermediateAssembly->'%(FullPath)')&quot; &quot;$(TargetPath)&quot; &quot;$(GameDir)/BepInEx/interop&quot;" />
   </Target>
 </Project>
