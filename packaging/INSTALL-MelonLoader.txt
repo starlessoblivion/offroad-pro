@@ -18,10 +18,11 @@ SETTINGS
 UserData/local.oth.drivesystems.cfg (created on the first run)
 
 UNINSTALL
-1. Close the game and remove the mod's items from your save:
+1. Delete Mods/OffroadPro.dll.
+2. To play the save without the mod, remove the mod's items from it with the cleanup script from GitHub
+   (game closed; it keeps a backup next to the save):
+   https://github.com/starlessoblivion/offroad-pro/blob/main/tools/remove_mod_items.py
    python3 remove_mod_items.py "<your save folder>/Player1.json"
-   (it keeps a backup next to the save)
-2. Delete Mods/OffroadPro.dll.
 
 PROBLEMS
 Logs: MelonLoader/Latest.log
